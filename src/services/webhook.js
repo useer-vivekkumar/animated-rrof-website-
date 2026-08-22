@@ -7,9 +7,20 @@ export async function submitLead(data) {
     body: JSON.stringify(data),
   })
 
-  if (!response.ok) {
-    throw new Error('Failed to submit lead')
+  const responseText = await response.text().catch(() => '')
+  let responseData = null
+
+  if (responseText) {
+    try {
+      responseData = JSON.parse(responseText)
+    } catch {
+      // A successful API response does not need to contain JSON.
+    }
   }
 
-  return true
+  if (!response.ok) {
+    throw new Error(responseData?.message || 'Failed to submit lead')
+  }
+
+  return responseData || { ok: true }
 }

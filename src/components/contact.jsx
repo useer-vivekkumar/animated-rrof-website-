@@ -4,9 +4,12 @@ import { submitLead } from '../services/webhook'
 function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [submittedData, setSubmittedData] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (isSubmitting) return
 
     const formData = new FormData(e.currentTarget)
 
@@ -18,6 +21,8 @@ function Contact() {
       message: formData.get('message'),
     }
 
+    setIsSubmitting(true)
+
     try {
       await submitLead(lead)
 
@@ -27,8 +32,8 @@ function Contact() {
       e.currentTarget.reset()
     } catch (error) {
       console.error('Lead submission failed:', error)
-
-      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -230,6 +235,7 @@ function Contact() {
             <button
               type="submit"
               className="primary-btn form-submit"
+              disabled={isSubmitting}
             >
               Request a Free Inspection
               <span>→</span>
