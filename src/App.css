@@ -111,15 +111,14 @@ a {
 
 .hero {
   min-height: 100vh;
-
   position: relative;
 
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: 0.9fr 1.1fr;
 
   align-items: center;
 
-  padding: 100px 3vw 60px;
+  padding: 100px 4vw 60px;
 
   background:
     radial-gradient(
@@ -159,7 +158,6 @@ a {
   z-index: 5;
   width: 100%;
   max-width: 650px;
-  transform: translateX(400px);
 }
 
 .eyebrow {
@@ -330,7 +328,6 @@ a {
 
   z-index: 2;
 
-  transform: translateX(-20px);
 }
 
 .glow {
@@ -353,7 +350,7 @@ a {
 
   display: block;
 
-  width: 115%;
+  width: min(100%, 900px);
   max-width: 900px;
 
   height: auto;
@@ -724,17 +721,19 @@ a {
 ========================= */
 
 @media (max-width: 1100px) {
-  .hero {
-    grid-template-columns:
-      minmax(0, 0.85fr)
-      minmax(0, 1.15fr);
 
+  .hero {
+    grid-template-columns: 0.9fr 1.1fr;
     padding-left: 3vw;
     padding-right: 3vw;
   }
 
   .hero-title {
     font-size: clamp(48px, 5.5vw, 70px);
+  }
+
+  .hero-visual {
+    min-height: 520px;
   }
 
   .house-image {
