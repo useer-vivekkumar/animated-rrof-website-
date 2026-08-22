@@ -1,3 +1,37 @@
+import { Buffer } from 'node:buffer'
+
+const N8N_WEBHOOK_URL = 'https://liamcarte.app.n8n.cloud/webhook-test/roof-demo'
+
+async function parseRequestBody(req) {
+  const { body } = req
+
+  if (body && typeof body === 'object' && !Buffer.isBuffer(body)) {
+    return body
+  }
+
+  const rawBody = Buffer.isBuffer(body)
+    ? body.toString('utf8')
+    : typeof body === 'string'
+      ? body
+      : await readRequestBody(req)
+
+  if (!rawBody) {
+    throw new Error('Request body is required')
+  }
+
+  return JSON.parse(rawBody)
+}
+
+async function readRequestBody(req) {
+  const chunks = []
+
+  for await (const chunk of req) {
+    chunks.push(chunk)
+  }
+
+  return Buffer.concat(chunks).toString('utf8')
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({
@@ -5,35 +39,35 @@ export default async function handler(req, res) {
     })
   }
 
-  try {
-    const lead = req.body
+  let lead
 
+  try {
+    lead = await parseRequestBody(req)
+  } catch (error) {
+    console.error('LEAD BODY ERROR:', error)
+
+    return res.status(400).json({
+      message: 'Invalid JSON request body',
+    })
+  }
+
+  try {
     console.log('LEAD RECEIVED:', lead)
 
-    const webhookResponse = await fetch(
-      'https://liamcarte.app.n8n.cloud/webhook-test/roof-demo',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(lead),
-      }
-    )
+    const webhookResponse = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(lead),
+    })
 
-    const responseText = await webhookResponse.text()
-
-    console.log(
-      'N8N RESPONSE:',
-      webhookResponse.status,
-      responseText
-    )
+    console.log('N8N RESPONSE:', webhookResponse.status)
 
     if (!webhookResponse.ok) {
       return res.status(502).json({
         message: 'n8n webhook failed',
         status: webhookResponse.status,
-        response: responseText,
       })
     }
 
