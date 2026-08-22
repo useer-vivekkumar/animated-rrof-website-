@@ -1,6 +1,10 @@
+import { useState } from 'react'
 import { submitLead } from '../services/webhook'
 
 function Contact() {
+  const [submitted, setSubmitted] = useState(false)
+  const [submittedData, setSubmittedData] = useState(null)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -17,7 +21,8 @@ function Contact() {
     try {
       await submitLead(lead)
 
-      alert('Request submitted successfully!')
+      setSubmittedData(lead)
+      setSubmitted(true)
 
       e.currentTarget.reset()
     } catch (error) {
@@ -82,110 +87,162 @@ function Contact() {
 
         </div>
 
-        <form className="inspection-form" onSubmit={handleSubmit}>
+        {submitted ? (
 
-          <div className="form-field">
+          <div className="submission-success">
 
-            <label>Full name</label>
+            <div className="success-icon">
+              ✓
+            </div>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="John Smith"
-              required
-            />
+            <h3>
+              Request received
+            </h3>
 
-          </div>
+            <p>
+              Thanks — we'll reach out shortly to schedule
+              your free inspection.
+            </p>
 
-          <div className="form-field">
+            <div className="submitted-contact">
 
-            <label>Phone number</label>
+              <span>PHONE</span>
+              <strong>{submittedData?.phone}</strong>
 
-            <input
-              type="tel"
-              name="phone"
-              placeholder="(555) 123-4567"
-              required
-            />
+              {submittedData?.email && (
+                <>
+                  <span>EMAIL</span>
+                  <strong>{submittedData.email}</strong>
+                </>
+              )}
 
-          </div>
+            </div>
 
-          <div className="form-field full-width">
-
-            <label>
-              Email address <span>(optional)</span>
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              placeholder="john@example.com"
-            />
-
-          </div>
-
-          <div className="form-field full-width">
-
-            <label>What do you need?</label>
-
-            <select
-              name="service"
-              defaultValue=""
-              required
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={() => {
+                setSubmitted(false)
+                setSubmittedData(null)
+              }}
             >
-
-              <option value="" disabled>
-                Select a service
-              </option>
-
-              <option value="roof-replacement">
-                Roof Replacement
-              </option>
-
-              <option value="roof-repair">
-                Roof Repair
-              </option>
-
-              <option value="roof-inspection">
-                Roof Inspection
-              </option>
-
-              <option value="storm-damage">
-                Storm Damage
-              </option>
-
-            </select>
+              Submit another request
+              <span>→</span>
+            </button>
 
           </div>
 
-          <div className="form-field full-width">
+        ) : (
 
-            <label>
-              Roof details <span>(optional)</span>
-            </label>
-
-            <textarea
-              name="message"
-              placeholder="Tell us what's going on with your roof..."
-              rows="5"
-            />
-
-          </div>
-
-          <button
-            type="submit"
-            className="primary-btn form-submit"
+          <form
+            className="inspection-form"
+            onSubmit={handleSubmit}
           >
-            Request a Free Inspection
-            <span>→</span>
-          </button>
 
-          <p className="form-note">
-            By submitting this form, you agree to be contacted
-            about your request. We don't share your information.
-          </p>
+            <div className="form-field">
 
-        </form>
+              <label>Full name</label>
+
+              <input
+                type="text"
+                name="name"
+                placeholder="John Smith"
+                required
+              />
+
+            </div>
+
+            <div className="form-field">
+
+              <label>Phone number</label>
+
+              <input
+                type="tel"
+                name="phone"
+                placeholder="(555) 123-4567"
+                required
+              />
+
+            </div>
+
+            <div className="form-field full-width">
+
+              <label>
+                Email address <span>(optional)</span>
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                placeholder="john@example.com"
+              />
+
+            </div>
+
+            <div className="form-field full-width">
+
+              <label>What do you need?</label>
+
+              <select
+                name="service"
+                defaultValue=""
+                required
+              >
+
+                <option value="" disabled>
+                  Select a service
+                </option>
+
+                <option value="roof-replacement">
+                  Roof Replacement
+                </option>
+
+                <option value="roof-repair">
+                  Roof Repair
+                </option>
+
+                <option value="roof-inspection">
+                  Roof Inspection
+                </option>
+
+                <option value="storm-damage">
+                  Storm Damage
+                </option>
+
+              </select>
+
+            </div>
+
+            <div className="form-field full-width">
+
+              <label>
+                Roof details <span>(optional)</span>
+              </label>
+
+              <textarea
+                name="message"
+                placeholder="Tell us what's going on with your roof..."
+                rows="5"
+              />
+
+            </div>
+
+            <button
+              type="submit"
+              className="primary-btn form-submit"
+            >
+              Request a Free Inspection
+              <span>→</span>
+            </button>
+
+            <p className="form-note">
+              By submitting this form, you agree to be contacted
+              about your request. We don't share your information.
+            </p>
+
+          </form>
+
+        )}
 
       </div>
 
