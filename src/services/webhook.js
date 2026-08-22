@@ -11,5 +11,5 @@ export async function submitLead(data) {
     throw new Error('Failed to submit lead')
   }
 
-  return response.json()
+  return true
 }

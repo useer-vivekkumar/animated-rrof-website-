@@ -6,31 +6,45 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(
+    const lead = req.body
+
+    console.log('LEAD RECEIVED:', lead)
+
+    const webhookResponse = await fetch(
       'https://liamcarte.app.n8n.cloud/webhook-test/roof-demo',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(req.body),
+        body: JSON.stringify(lead),
       }
     )
 
-    if (!response.ok) {
+    const responseText = await webhookResponse.text()
+
+    console.log(
+      'N8N RESPONSE:',
+      webhookResponse.status,
+      responseText
+    )
+
+    if (!webhookResponse.ok) {
       return res.status(502).json({
         message: 'n8n webhook failed',
+        status: webhookResponse.status,
+        response: responseText,
       })
     }
 
     return res.status(200).json({
-      success: true,
+      ok: true,
     })
   } catch (error) {
-    console.error(error)
+    console.error('LEAD ERROR:', error)
 
     return res.status(500).json({
-      message: 'Unable to submit lead',
+      message: error.message || "Couldn't send lead",
     })
   }
 }
